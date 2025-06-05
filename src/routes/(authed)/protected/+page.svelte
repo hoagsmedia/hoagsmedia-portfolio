@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { PageServerData } from './$types';
+	import type { LayoutData } from '../$types';
 
-	let { data }: { data: PageServerData } = $props();
+	let { data }: { data: LayoutData } = $props();
 </script>
 
 <div class="min-h-screen bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -39,7 +39,7 @@
 
 				<div class="mt-8 flex space-x-4">
 					<a
-						href="/auth/lucia"
+						href="/dashboard"
 						class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
 					>
 						Go to Dashboard

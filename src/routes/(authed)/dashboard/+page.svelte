@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { PageServerData } from './$types';
+	import type { LayoutData } from '../$types';
 
-	let { data }: { data: PageServerData } = $props();
+	let { data }: { data: LayoutData } = $props();
 </script>
 
 <div class="min-h-screen bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
@@ -32,6 +32,12 @@
 				class="inline-flex justify-center rounded-md border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 shadow-sm hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
 			>
 				View Protected Content
+			</a>
+			<a
+				href="/settings"
+				class="inline-flex justify-center rounded-md border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 shadow-sm hover:bg-green-100 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+			>
+				Account Settings
 			</a>
 			<a
 				href="/"

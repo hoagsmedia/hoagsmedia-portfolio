@@ -37,15 +37,14 @@
 				{#if data.user}
 					<div class="flex items-center space-x-2">
 						<NavigationMenu.Link
-							href="/auth/lucia"
+							href="/dashboard"
 							class="hover:text-gray-600 dark:hover:text-gray-400">Dashboard</NavigationMenu.Link
 						>
 						<span class="text-sm text-gray-500 dark:text-gray-400">({data.user.username})</span>
 					</div>
 				{:else}
-					<NavigationMenu.Link
-						href="/auth/lucia/login"
-						class="hover:text-gray-600 dark:hover:text-gray-400">Login</NavigationMenu.Link
+					<NavigationMenu.Link href="/login" class="hover:text-gray-600 dark:hover:text-gray-400"
+						>Login</NavigationMenu.Link
 					>
 				{/if}
 			</NavigationMenu.Item>

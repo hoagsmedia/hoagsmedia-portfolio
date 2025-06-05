@@ -11,13 +11,6 @@ This project uses Lucia for session-based authentication with the following feat
 - **Protected routes** with automatic redirects
 - **Session management** with automatic renewal
 
-## Test User
-
-A demo user is available for testing:
-
-- **Username**: `joshua`
-- **Password**: `password123`
-
 ## Usage
 
 ### 1. Start the development server
@@ -28,13 +21,13 @@ pnpm dev
 
 ### 2. Navigate to authentication pages
 
-- Login: `/auth/lucia/login`
-- Dashboard: `/auth/lucia` (requires authentication)
+- Login: `/login`
+- Dashboard: `/dashboard` (requires authentication)
 - Protected content: `/protected` (requires authentication)
 
 ### 3. Test the authentication flow
 
-1. Go to `/auth/lucia/login`
+1. Go to `/login`
 2. Use the test credentials above or create a new account
 3. After login, you'll be redirected to the dashboard
 4. Try accessing `/protected` to see route protection in action
@@ -63,7 +56,7 @@ Routes can be protected by checking `locals.user` in the `+page.server.ts` file:
 ```typescript
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		return redirect(302, '/auth/lucia/login');
+		return redirect(302, '/login');
 	}
 	return { user: locals.user };
 };
