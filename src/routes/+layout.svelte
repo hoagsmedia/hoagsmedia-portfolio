@@ -1,10 +1,11 @@
 <script lang="ts">
 	import '../app.css';
 	import * as NavigationMenu from '$lib/components/ui/navigation-menu/index.js';
-	import { themeStore } from '$lib/stores/theme.svelte.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { LightSwitch } from '$lib/components';
+	import type { LayoutServerData } from './$types';
 
-	let { children } = $props();
+	let { children, data }: { children: any; data: LayoutServerData } = $props();
 </script>
 
 <div
@@ -33,13 +34,23 @@
 				>
 			</NavigationMenu.Item>
 			<NavigationMenu.Item>
-				<Button
-					variant="outline"
-					onclick={themeStore.toggle}
-					class="ml-4 border-gray-300 px-3 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
-				>
-					{themeStore.isDark ? '☀️' : '🌙'}
-				</Button>
+				{#if data.user}
+					<div class="flex items-center space-x-2">
+						<NavigationMenu.Link
+							href="/auth/lucia"
+							class="hover:text-gray-600 dark:hover:text-gray-400">Dashboard</NavigationMenu.Link
+						>
+						<span class="text-sm text-gray-500 dark:text-gray-400">({data.user.username})</span>
+					</div>
+				{:else}
+					<NavigationMenu.Link
+						href="/auth/lucia/login"
+						class="hover:text-gray-600 dark:hover:text-gray-400">Login</NavigationMenu.Link
+					>
+				{/if}
+			</NavigationMenu.Item>
+			<NavigationMenu.Item>
+				<LightSwitch />
 			</NavigationMenu.Item>
 		</NavigationMenu.List>
 	</NavigationMenu.Root>
