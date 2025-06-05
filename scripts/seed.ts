@@ -1,4 +1,6 @@
-import { db } from '../src/lib/server/db/index-script.js';
+import { drizzle } from 'drizzle-orm/libsql';
+import { createClient } from '@libsql/client';
+import { config } from 'dotenv';
 import {
 	user,
 	project,
@@ -6,7 +8,17 @@ import {
 	type NewProject,
 	type NewProjectTechnology
 } from '../src/lib/server/db/schema.js';
+import * as schema from '../src/lib/server/db/schema.js';
 import { hash } from '@node-rs/argon2';
+
+// Load environment variables from .env file
+config();
+
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) throw new Error('DATABASE_URL is not set');
+
+const client = createClient({ url: DATABASE_URL });
+const db = drizzle(client, { schema });
 
 async function seed() {
 	try {
