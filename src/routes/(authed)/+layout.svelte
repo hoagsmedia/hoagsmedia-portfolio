@@ -4,35 +4,35 @@
 	let { data, children }: { data: LayoutData; children: any } = $props();
 </script>
 
-<div class="min-h-screen bg-gray-50">
+<div class="bg-background min-h-screen transition-colors">
 	<!-- Authenticated layout header -->
-	<header class="border-b bg-white shadow-sm">
+	<header class="bg-card border-b shadow-sm transition-colors">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div class="flex h-16 items-center justify-between">
 				<div class="flex items-center space-x-4">
-					<h1 class="text-xl font-semibold text-gray-900">Dashboard</h1>
+					<h1 class="text-card-foreground text-xl font-semibold">Dashboard</h1>
 					<nav class="flex space-x-4">
 						<a
 							href="/dashboard"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+							class="text-muted-foreground hover:text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
 						>
 							Dashboard
 						</a>
 						<a
 							href="/projects"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+							class="text-muted-foreground hover:text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
 						>
 							Projects
 						</a>
 						<a
 							href="/protected"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+							class="text-muted-foreground hover:text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
 						>
 							Protected
 						</a>
 						<a
 							href="/settings"
-							class="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+							class="text-muted-foreground hover:text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors"
 						>
 							Settings
 						</a>
@@ -40,13 +40,13 @@
 				</div>
 
 				<div class="flex items-center space-x-4">
-					<span class="text-sm text-gray-600">
+					<span class="text-muted-foreground text-sm">
 						Welcome, {data.user.username}!
 					</span>
 					<form action="/dashboard?/logout" method="POST" class="inline">
 						<button
 							type="submit"
-							class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+							class="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 text-sm font-medium transition-colors"
 						>
 							Logout
 						</button>

@@ -11,11 +11,13 @@
 	let isChangingPassword = $state(false);
 </script>
 
-<div class="min-h-screen bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+<div class="bg-muted min-h-screen px-4 py-12 transition-colors sm:px-6 lg:px-8">
 	<div class="mx-auto max-w-4xl">
 		<div class="mb-8">
-			<h1 class="text-3xl font-bold text-gray-900">Account Settings</h1>
-			<p class="mt-2 text-gray-600">Manage your account preferences and security settings.</p>
+			<h1 class="text-foreground text-3xl font-bold">Account Settings</h1>
+			<p class="text-muted-foreground mt-2">
+				Manage your account preferences and security settings.
+			</p>
 		</div>
 
 		<div class="grid gap-6 lg:grid-cols-3">
@@ -24,19 +26,19 @@
 				<nav class="space-y-1">
 					<a
 						href="#profile"
-						class="flex items-center rounded-md bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700"
+						class="bg-primary text-primary-foreground flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors"
 					>
 						Profile
 					</a>
 					<a
 						href="#security"
-						class="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+						class="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors"
 					>
 						Security
 					</a>
 					<a
 						href="#preferences"
-						class="flex items-center rounded-md px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+						class="text-foreground hover:bg-accent hover:text-accent-foreground flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors"
 					>
 						Preferences
 					</a>
@@ -46,26 +48,30 @@
 			<!-- Main Content -->
 			<div class="space-y-6 lg:col-span-2">
 				<!-- Profile Section -->
-				<div id="profile" class="rounded-lg bg-white shadow">
+				<div id="profile" class="bg-card rounded-lg shadow transition-colors">
 					<div class="px-4 py-5 sm:p-6">
-						<h3 class="mb-4 text-lg font-medium text-gray-900">Profile Information</h3>
+						<h3 class="text-card-foreground mb-4 text-lg font-medium">Profile Information</h3>
 
 						<div class="grid gap-4 sm:grid-cols-2">
 							<div class="sm:col-span-2">
-								<div class="rounded-md border border-gray-200 bg-gray-50 p-4">
+								<div class="bg-muted rounded-md border p-4 transition-colors">
 									<div class="flex items-center space-x-3">
 										<div class="flex-shrink-0">
 											<div
-												class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600"
+												class="bg-primary flex h-10 w-10 items-center justify-center rounded-full"
 											>
-												<span class="text-sm font-medium text-white">
+												<span class="text-primary-foreground text-sm font-medium">
 													{data.user.username.charAt(0).toUpperCase()}
 												</span>
 											</div>
 										</div>
 										<div>
-											<p class="text-sm font-medium text-gray-900">{data.user.username}</p>
-											<p class="text-sm text-gray-500">User ID: {data.user.id}</p>
+											<p class="text-card-foreground text-sm font-medium">
+												{data.user.username}
+											</p>
+											<p class="text-muted-foreground text-sm">
+												User ID: {data.user.id}
+											</p>
 										</div>
 									</div>
 								</div>
@@ -99,11 +105,11 @@
 
 							{#if form?.message}
 								<div
-									class="mt-4 rounded-md {form.success
-										? 'border border-green-200 bg-green-50'
-										: 'border border-red-200 bg-red-50'} p-4"
+									class="mt-4 rounded-md border p-4 transition-colors {form.success
+										? 'border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-300'
+										: 'border-destructive/20 bg-destructive/10 text-destructive'}"
 								>
-									<p class="text-sm {form.success ? 'text-green-800' : 'text-red-800'}">
+									<p class="text-sm">
 										{form.message}
 									</p>
 								</div>
@@ -117,17 +123,17 @@
 				</div>
 
 				<!-- Security Section -->
-				<div id="security" class="rounded-lg bg-white shadow">
+				<div id="security" class="bg-card rounded-lg shadow transition-colors">
 					<div class="px-4 py-5 sm:p-6">
-						<h3 class="mb-4 text-lg font-medium text-gray-900">Security Settings</h3>
+						<h3 class="text-card-foreground mb-4 text-lg font-medium">Security Settings</h3>
 
 						<div class="space-y-6">
 							<!-- Change Password -->
 							<div>
 								<div class="flex items-center justify-between">
 									<div>
-										<h4 class="text-sm font-medium text-gray-900">Password</h4>
-										<p class="text-sm text-gray-500">Change your account password</p>
+										<h4 class="text-card-foreground text-sm font-medium">Password</h4>
+										<p class="text-muted-foreground text-sm">Change your account password</p>
 									</div>
 									<Button
 										variant="outline"
@@ -173,8 +179,10 @@
 										</div>
 
 										{#if form?.passwordError}
-											<div class="rounded-md border border-red-200 bg-red-50 p-4">
-												<p class="text-sm text-red-800">{form.passwordError}</p>
+											<div
+												class="border-destructive/20 bg-destructive/10 rounded-md border p-4 transition-colors"
+											>
+												<p class="text-destructive text-sm">{form.passwordError}</p>
 											</div>
 										{/if}
 
@@ -193,8 +201,8 @@
 							</div>
 
 							<!-- Account Actions -->
-							<div class="border-t pt-6">
-								<h4 class="mb-4 text-sm font-medium text-gray-900">Account Actions</h4>
+							<div class="border-t pt-6 transition-colors">
+								<h4 class="text-card-foreground mb-4 text-sm font-medium">Account Actions</h4>
 								<div class="space-y-3">
 									<form method="POST" action="?/clearSessions" use:enhance>
 										<Button variant="outline" type="submit" class="w-full sm:w-auto">
@@ -208,33 +216,35 @@
 				</div>
 
 				<!-- Preferences Section -->
-				<div id="preferences" class="rounded-lg bg-white shadow">
+				<div id="preferences" class="bg-card rounded-lg shadow transition-colors">
 					<div class="px-4 py-5 sm:p-6">
-						<h3 class="mb-4 text-lg font-medium text-gray-900">Preferences</h3>
+						<h3 class="text-card-foreground mb-4 text-lg font-medium">Preferences</h3>
 
 						<form method="POST" action="?/updatePreferences" use:enhance>
 							<div class="space-y-4">
 								<div class="flex items-center justify-between">
 									<div>
-										<h4 class="text-sm font-medium text-gray-900">Email Notifications</h4>
-										<p class="text-sm text-gray-500">Receive email updates about your account</p>
+										<h4 class="text-card-foreground text-sm font-medium">Email Notifications</h4>
+										<p class="text-muted-foreground text-sm">
+											Receive email updates about your account
+										</p>
 									</div>
 									<input
 										type="checkbox"
 										name="emailNotifications"
-										class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+										class="border-input text-primary focus:ring-ring h-4 w-4 rounded transition-colors"
 									/>
 								</div>
 
 								<div class="flex items-center justify-between">
 									<div>
-										<h4 class="text-sm font-medium text-gray-900">Dark Mode</h4>
-										<p class="text-sm text-gray-500">Use dark theme for the interface</p>
+										<h4 class="text-card-foreground text-sm font-medium">Dark Mode</h4>
+										<p class="text-muted-foreground text-sm">Use dark theme for the interface</p>
 									</div>
 									<input
 										type="checkbox"
 										name="darkMode"
-										class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+										class="border-input text-primary focus:ring-ring h-4 w-4 rounded transition-colors"
 									/>
 								</div>
 							</div>
@@ -252,7 +262,7 @@
 		<div class="mt-8 flex space-x-4">
 			<a
 				href="/dashboard"
-				class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+				class="bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground focus:ring-ring inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
 			>
 				← Back to Dashboard
 			</a>

@@ -1,6 +1,6 @@
 import { db } from './index';
 import {
-	project,
+	projectTable,
 	projectTechnology,
 	type NewProject,
 	type NewProjectTechnology,
@@ -14,23 +14,31 @@ export class ProjectService {
 	static async getProjectsByUserId(userId: string): Promise<Project[]> {
 		return await db
 			.select()
-			.from(project)
-			.where(eq(project.userId, userId))
-			.orderBy(desc(project.featured), asc(project.sortOrder), desc(project.createdAt));
+			.from(projectTable)
+			.where(eq(projectTable.userId, userId))
+			.orderBy(
+				desc(projectTable.featured),
+				asc(projectTable.sortOrder),
+				desc(projectTable.createdAt)
+			);
 	}
 
 	// Get all public/featured projects
 	static async getFeaturedProjects(): Promise<Project[]> {
 		return await db
 			.select()
-			.from(project)
-			.where(eq(project.featured, true))
-			.orderBy(asc(project.sortOrder), desc(project.createdAt));
+			.from(projectTable)
+			.where(eq(projectTable.featured, true))
+			.orderBy(asc(projectTable.sortOrder), desc(projectTable.createdAt));
 	}
 
 	// Get a single project with technologies
 	static async getProjectById(projectId: string): Promise<ProjectWithTechnologies | null> {
-		const projectData = await db.select().from(project).where(eq(project.id, projectId)).limit(1);
+		const projectData = await db
+			.select()
+			.from(projectTable)
+			.where(eq(projectTable.id, projectId))
+			.limit(1);
 
 		if (projectData.length === 0) return null;
 
@@ -47,26 +55,26 @@ export class ProjectService {
 
 	// Create a new project
 	static async createProject(projectData: NewProject) {
-		const [newProject] = await db.insert(project).values(projectData).returning();
+		const [newProject] = await db.insert(projectTable).values(projectData).returning();
 		return newProject;
 	}
 
 	// Update project
 	static async updateProject(projectId: string, updates: Partial<NewProject>) {
 		const [updatedProject] = await db
-			.update(project)
+			.update(projectTable)
 			.set({
 				...updates,
 				updatedAt: new Date()
 			})
-			.where(eq(project.id, projectId))
+			.where(eq(projectTable.id, projectId))
 			.returning();
 		return updatedProject;
 	}
 
 	// Delete project
 	static async deleteProject(projectId: string) {
-		await db.delete(project).where(eq(project.id, projectId));
+		await db.delete(projectTable).where(eq(projectTable.id, projectId));
 	}
 
 	// Add technology to project

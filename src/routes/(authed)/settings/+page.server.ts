@@ -6,6 +6,19 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
 
+function validateUsername(username: unknown): username is string {
+	return (
+		typeof username === 'string' &&
+		username.length >= 3 &&
+		username.length <= 31 &&
+		/^[a-zA-Z0-9_-]+$/.test(username)
+	);
+}
+
+function validatePassword(password: unknown): password is string {
+	return typeof password === 'string' && password.length >= 6 && password.length <= 255;
+}
+
 export const load: PageServerLoad = async ({ locals }) => {
 	// User is guaranteed to exist due to (authed) layout
 	return {
@@ -25,7 +38,8 @@ export const actions: Actions = {
 
 		if (!validateUsername(username)) {
 			return fail(400, {
-				message: 'Invalid username (min 3, max 31 characters, alphanumeric only)',
+				message:
+					'Invalid username (min 3, max 31 characters, letters, numbers, underscore and dash only)',
 				success: false
 			});
 		}
@@ -35,8 +49,8 @@ export const actions: Actions = {
 			if (username !== locals.user.username) {
 				const existingUser = await db
 					.select()
-					.from(table.user)
-					.where(eq(table.user.username, username))
+					.from(table.usersTable)
+					.where(eq(table.usersTable.username, username))
 					.limit(1);
 
 				if (existingUser.length > 0) {
@@ -55,7 +69,10 @@ export const actions: Actions = {
 				updateData.email = email.trim();
 			}
 
-			await db.update(table.user).set(updateData).where(eq(table.user.id, locals.user.id));
+			await db
+				.update(table.usersTable)
+				.set(updateData)
+				.where(eq(table.usersTable.id, locals.user.id));
 
 			return {
 				message: 'Profile updated successfully!',
@@ -94,18 +111,19 @@ export const actions: Actions = {
 
 		try {
 			// Get current user data
-			const userData = await db
+			const [userData] = await db
 				.select()
-				.from(table.user)
-				.where(eq(table.user.id, locals.user.id))
+				.from(table.usersTable)
+				.where(eq(table.usersTable.id, locals.user.id))
 				.limit(1);
+			console.log('User data:', userData);
 
-			if (!userData[0]) {
+			if (!userData) {
 				return fail(404, { passwordError: 'User not found' });
 			}
 
 			// Verify current password
-			const validPassword = await verify(userData[0].passwordHash, currentPassword, {
+			const validPassword = await verify(userData.passwordHash, currentPassword, {
 				memoryCost: 19456,
 				timeCost: 2,
 				outputLen: 32,
@@ -126,9 +144,9 @@ export const actions: Actions = {
 
 			// Update password
 			await db
-				.update(table.user)
+				.update(table.usersTable)
 				.set({ passwordHash: newPasswordHash })
-				.where(eq(table.user.id, locals.user.id));
+				.where(eq(table.usersTable.id, locals.user.id));
 
 			return {
 				message: 'Password updated successfully!',
@@ -180,16 +198,3 @@ export const actions: Actions = {
 		};
 	}
 };
-
-function validateUsername(username: unknown): username is string {
-	return (
-		typeof username === 'string' &&
-		username.length >= 3 &&
-		username.length <= 31 &&
-		/^[a-z0-9_-]+$/.test(username)
-	);
-}
-
-function validatePassword(password: unknown): password is string {
-	return typeof password === 'string' && password.length >= 6 && password.length <= 255;
-}

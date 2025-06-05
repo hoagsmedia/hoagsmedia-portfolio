@@ -5,8 +5,8 @@
 	let { data }: { data: LayoutData } = $props();
 </script>
 
-<div class="min-h-screen bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-	<div class="mx-auto max-w-md rounded-lg bg-white p-6 shadow-md">
+<div class="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+	<div class="mx-auto max-w-md rounded-lg p-6 shadow-md">
 		<div class="text-center">
 			<h1 class="mb-2 text-2xl font-bold text-gray-900">Welcome back!</h1>
 			<p class="mb-4 text-gray-600">You are successfully signed in.</p>

@@ -31,11 +31,15 @@ export async function validateSessionToken(token: string) {
 	const [result] = await db
 		.select({
 			// Adjust user table here to tweak returned data
-			user: { id: table.user.id, username: table.user.username, email: table.user.email },
+			user: {
+				id: table.usersTable.id,
+				username: table.usersTable.username,
+				email: table.usersTable.email
+			},
 			session: table.session
 		})
 		.from(table.session)
-		.innerJoin(table.user, eq(table.session.userId, table.user.id))
+		.innerJoin(table.usersTable, eq(table.session.userId, table.usersTable.id))
 		.where(eq(table.session.id, sessionId));
 
 	if (!result) {
