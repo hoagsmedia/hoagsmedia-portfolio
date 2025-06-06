@@ -1,48 +1,49 @@
+import type { Actions, PageServerLoad } from './$types';
+import { superValidate, type Infer } from 'sveltekit-superforms';
+import { profileSchema, updatePasswordSchema } from './settings-schema';
+import { zod } from 'sveltekit-superforms/adapters';
 import { hash, verify } from '@node-rs/argon2';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import type { Actions, PageServerLoad } from './$types';
-
-function validateUsername(username: unknown): username is string {
-	return (
-		typeof username === 'string' &&
-		username.length >= 3 &&
-		username.length <= 31 &&
-		/^[a-zA-Z0-9_-]+$/.test(username)
-	);
-}
 
 function validatePassword(password: unknown): password is string {
 	return typeof password === 'string' && password.length >= 6 && password.length <= 255;
 }
+type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// User is guaranteed to exist due to (authed) layout
+	const user = locals.user!;
+
+	const profileForm = await superValidate<Infer<typeof profileSchema>, Message>(
+		{
+			username: user.username,
+			email: user.email ?? undefined
+		},
+		zod(profileSchema)
+	);
+	const passwordForm = await superValidate<Infer<typeof updatePasswordSchema>, Message>(
+		zod(updatePasswordSchema)
+	);
 	return {
-		user: locals.user
+		user,
+		profileForm,
+		passwordForm
 	};
 };
 
 export const actions: Actions = {
 	updateProfile: async ({ request, locals }) => {
 		if (!locals.user) {
-			return fail(401, { message: 'Unauthorized' });
+			return fail(401, { profileForm: null, message: 'Unauthorized' });
 		}
 
-		const formData = await request.formData();
-		const username = formData.get('username') as string;
-		const email = formData.get('email') as string;
+		const profileForm = await superValidate(request, zod(profileSchema));
+		if (!profileForm.valid) return fail(400, { profileForm });
 
-		if (!validateUsername(username)) {
-			return fail(400, {
-				message:
-					'Invalid username (min 3, max 31 characters, letters, numbers, underscore and dash only)',
-				success: false
-			});
-		}
+		const { username, email } = profileForm.data;
 
 		try {
 			// Check if username is already taken (by another user)
@@ -54,10 +55,10 @@ export const actions: Actions = {
 					.limit(1);
 
 				if (existingUser.length > 0) {
-					return fail(400, {
-						message: 'Username is already taken',
-						success: false
-					});
+					profileForm.message = {
+						text: 'Username is already taken'
+					};
+					return fail(400, { profileForm });
 				}
 			}
 
@@ -74,16 +75,18 @@ export const actions: Actions = {
 				.set(updateData)
 				.where(eq(table.usersTable.id, locals.user.id));
 
-			return {
-				message: 'Profile updated successfully!',
-				success: true
+			profileForm.message = {
+				status: 'success',
+				text: 'Profile updated successfully!'
 			};
+			return { profileForm };
 		} catch (error) {
 			console.error('Profile update error:', error);
-			return fail(500, {
-				message: 'Failed to update profile',
-				success: false
-			});
+			profileForm.message = {
+				status: 'error',
+				text: 'Failed to update profile'
+			};
+			return fail(500, { profileForm });
 		}
 	},
 

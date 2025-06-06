@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { LayoutData } from '../$types';
-	import type { ActionData } from './$types';
+	import type { PageData } from './$types';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
+	import SettingsForm from './settings-form.svelte';
 
-	let { data, form }: { data: LayoutData; form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
 
 	let isChangingPassword = $state(false);
 </script>
@@ -77,48 +77,7 @@
 								</div>
 							</div>
 						</div>
-
-						<form method="POST" action="?/updateProfile" use:enhance class="mt-6">
-							<div class="grid gap-4 sm:grid-cols-2">
-								<div class="sm:col-span-1">
-									<Label for="username">Username</Label>
-									<Input
-										id="username"
-										name="username"
-										type="text"
-										value={data.user.username}
-										class="mt-1"
-									/>
-								</div>
-								<div class="sm:col-span-1">
-									<Label for="email">Email (optional)</Label>
-									<Input
-										id="email"
-										name="email"
-										type="email"
-										value={data.user.email || ''}
-										placeholder="your@email.com"
-										class="mt-1"
-									/>
-								</div>
-							</div>
-
-							{#if form?.message}
-								<div
-									class="mt-4 rounded-md border p-4 transition-colors {form.success
-										? 'border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-300'
-										: 'border-destructive/20 bg-destructive/10 text-destructive'}"
-								>
-									<p class="text-sm">
-										{form.message}
-									</p>
-								</div>
-							{/if}
-
-							<div class="mt-6">
-								<Button type="submit" class="w-full sm:w-auto">Update Profile</Button>
-							</div>
-						</form>
+						<SettingsForm data={{ form: data.profileForm }} />
 					</div>
 				</div>
 
@@ -178,13 +137,13 @@
 											/>
 										</div>
 
-										{#if form?.passwordError}
+										<!-- {#if form?.passwordError}
 											<div
 												class="border-destructive/20 bg-destructive/10 rounded-md border p-4 transition-colors"
 											>
 												<p class="text-destructive text-sm">{form.passwordError}</p>
 											</div>
-										{/if}
+										{/if} -->
 
 										<div class="flex space-x-3">
 											<Button type="submit">Update Password</Button>
