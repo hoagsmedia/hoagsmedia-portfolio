@@ -4,11 +4,12 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import SettingsForm from './settings-form.svelte';
+	import ProfileForm from './profile-form.svelte';
+	import SecurityForm from './security-form.svelte';
 
 	let { data }: { data: PageData } = $props();
 
-	let isChangingPassword = $state(false);
+	let isUpdatingPassword = $state(false);
 </script>
 
 <div class="bg-muted min-h-screen px-4 py-12 transition-colors sm:px-6 lg:px-8">
@@ -77,33 +78,33 @@
 								</div>
 							</div>
 						</div>
-						<SettingsForm data={{ form: data.profileForm }} />
+						<ProfileForm data={{ form: data.profileForm }} />
 					</div>
 				</div>
+				<SecurityForm data={{ form: data.securityForm }} />
 
-				<!-- Security Section -->
+				<!-- Security Section
 				<div id="security" class="bg-card rounded-lg shadow transition-colors">
 					<div class="px-4 py-5 sm:p-6">
 						<h3 class="text-card-foreground mb-4 text-lg font-medium">Security Settings</h3>
 
 						<div class="space-y-6">
-							<!-- Change Password -->
 							<div>
 								<div class="flex items-center justify-between">
 									<div>
 										<h4 class="text-card-foreground text-sm font-medium">Password</h4>
-										<p class="text-muted-foreground text-sm">Change your account password</p>
+										<p class="text-muted-foreground text-sm">Update your account password</p>
 									</div>
 									<Button
 										variant="outline"
-										onclick={() => (isChangingPassword = !isChangingPassword)}
+										onclick={() => (isUpdatingPassword = !isUpdatingPassword)}
 									>
-										{isChangingPassword ? 'Cancel' : 'Change Password'}
+										{isUpdatingPassword ? 'Cancel' : 'Update Password'}
 									</Button>
 								</div>
 
-								{#if isChangingPassword}
-									<form method="POST" action="?/changePassword" use:enhance class="mt-4 space-y-4">
+								{#if isUpdatingPassword}
+									<form method="POST" action="?/updatePassword" use:enhance class="mt-4 space-y-4">
 										<div>
 											<Label for="currentPassword">Current Password</Label>
 											<Input
@@ -137,20 +138,12 @@
 											/>
 										</div>
 
-										<!-- {#if form?.passwordError}
-											<div
-												class="border-destructive/20 bg-destructive/10 rounded-md border p-4 transition-colors"
-											>
-												<p class="text-destructive text-sm">{form.passwordError}</p>
-											</div>
-										{/if} -->
-
 										<div class="flex space-x-3">
 											<Button type="submit">Update Password</Button>
 											<Button
 												type="button"
 												variant="outline"
-												onclick={() => (isChangingPassword = false)}
+												onclick={() => (isUpdatingPassword = false)}
 											>
 												Cancel
 											</Button>
@@ -159,7 +152,6 @@
 								{/if}
 							</div>
 
-							<!-- Account Actions -->
 							<div class="border-t pt-6 transition-colors">
 								<h4 class="text-card-foreground mb-4 text-sm font-medium">Account Actions</h4>
 								<div class="space-y-3">
@@ -172,7 +164,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</div> -->
 
 				<!-- Preferences Section -->
 				<div id="preferences" class="bg-card rounded-lg shadow transition-colors">

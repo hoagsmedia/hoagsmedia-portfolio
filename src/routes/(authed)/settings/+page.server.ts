@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { superValidate, type Infer } from 'sveltekit-superforms';
+import { message, superValidate, type Infer } from 'sveltekit-superforms';
 import { profileSchema, updatePasswordSchema } from './settings-schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import { hash, verify } from '@node-rs/argon2';
@@ -9,38 +9,40 @@ import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 
-function validatePassword(password: unknown): password is string {
-	return typeof password === 'string' && password.length >= 6 && password.length <= 255;
-}
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = locals.user!;
+	console.log('Loading settings for user:', user);
+	const userData = {
+		...user,
+		email: user.email ?? undefined
+	};
 
 	const profileForm = await superValidate<Infer<typeof profileSchema>, Message>(
-		{
-			username: user.username,
-			email: user.email ?? undefined
-		},
+		userData,
 		zod(profileSchema)
 	);
-	const passwordForm = await superValidate<Infer<typeof updatePasswordSchema>, Message>(
+	const securityForm = await superValidate<Infer<typeof updatePasswordSchema>>(
 		zod(updatePasswordSchema)
 	);
 	return {
 		user,
 		profileForm,
-		passwordForm
+		securityForm
 	};
 };
 
 export const actions: Actions = {
 	updateProfile: async ({ request, locals }) => {
+		console.log('Update profile action called');
 		if (!locals.user) {
 			return fail(401, { profileForm: null, message: 'Unauthorized' });
 		}
 
 		const profileForm = await superValidate(request, zod(profileSchema));
+		console.log('Profile form data:', profileForm.data);
+
 		if (!profileForm.valid) return fail(400, { profileForm });
 
 		const { username, email } = profileForm.data;
@@ -55,10 +57,7 @@ export const actions: Actions = {
 					.limit(1);
 
 				if (existingUser.length > 0) {
-					profileForm.message = {
-						text: 'Username is already taken'
-					};
-					return fail(400, { profileForm });
+					return fail(400, { error: 'Username is already taken', profileForm });
 				}
 			}
 
@@ -74,43 +73,25 @@ export const actions: Actions = {
 				.update(table.usersTable)
 				.set(updateData)
 				.where(eq(table.usersTable.id, locals.user.id));
+			return message(profileForm, { text: 'Form posted successfully!', status: 'success' });
 
-			profileForm.message = {
-				status: 'success',
-				text: 'Profile updated successfully!'
-			};
-			return { profileForm };
+			// return message(profileForm, 'Profile updated successfully!');
 		} catch (error) {
 			console.error('Profile update error:', error);
-			profileForm.message = {
-				status: 'error',
-				text: 'Failed to update profile'
-			};
-			return fail(500, { profileForm });
+			return fail(400, {
+				text: ' Failed to update profile',
+				profileForm
+			});
 		}
 	},
 
-	changePassword: async ({ request, locals }) => {
+	updatePassword: async ({ request, locals }) => {
 		if (!locals.user) {
 			return fail(401, { passwordError: 'Unauthorized' });
 		}
 
-		const formData = await request.formData();
-		const currentPassword = formData.get('currentPassword') as string;
-		const newPassword = formData.get('newPassword') as string;
-		const confirmPassword = formData.get('confirmPassword') as string;
-
-		if (!validatePassword(newPassword)) {
-			return fail(400, {
-				passwordError: 'New password must be between 6 and 255 characters'
-			});
-		}
-
-		if (newPassword !== confirmPassword) {
-			return fail(400, {
-				passwordError: 'New passwords do not match'
-			});
-		}
+		const passwordForm = await superValidate(request, zod(updatePasswordSchema));
+		if (!passwordForm.valid) return fail(400, { passwordForm });
 
 		try {
 			// Get current user data
@@ -119,14 +100,13 @@ export const actions: Actions = {
 				.from(table.usersTable)
 				.where(eq(table.usersTable.id, locals.user.id))
 				.limit(1);
-			console.log('User data:', userData);
 
 			if (!userData) {
-				return fail(404, { passwordError: 'User not found' });
+				return fail(404, { error: 'User not found', passwordForm });
 			}
 
 			// Verify current password
-			const validPassword = await verify(userData.passwordHash, currentPassword, {
+			const validPassword = await verify(userData.passwordHash, passwordForm.data.currentPassword, {
 				memoryCost: 19456,
 				timeCost: 2,
 				outputLen: 32,
@@ -134,11 +114,11 @@ export const actions: Actions = {
 			});
 
 			if (!validPassword) {
-				return fail(400, { passwordError: 'Current password is incorrect' });
+				return fail(400, { error: 'Current password is incorrect', passwordForm });
 			}
 
 			// Hash new password
-			const newPasswordHash = await hash(newPassword, {
+			const newPasswordHash = await hash(passwordForm.data.password, {
 				memoryCost: 19456,
 				timeCost: 2,
 				outputLen: 32,
@@ -151,14 +131,11 @@ export const actions: Actions = {
 				.set({ passwordHash: newPasswordHash })
 				.where(eq(table.usersTable.id, locals.user.id));
 
-			return {
-				message: 'Password updated successfully!',
-				success: true
-			};
+			return message(passwordForm, { text: 'Password updated successfully!', status: 'success' });
 		} catch (error) {
 			console.error('Password change error:', error);
-			return fail(500, {
-				passwordError: 'Failed to update password'
+			return fail(400, {
+				text: 'Failed to change password'
 			});
 		}
 	},
