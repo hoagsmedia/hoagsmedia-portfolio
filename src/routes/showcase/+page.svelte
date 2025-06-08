@@ -4,16 +4,6 @@
 	import SelectAdd from '$lib/components/showcase/SelectAdd.svelte';
 
 	let { data }: PageProps = $props();
-	interface Option {
-		id: number;
-		value: string;
-		label: string;
-	}
-
-	const options: Option[] = [
-		{ id: 1, value: 'apple', label: 'Apple' },
-		{ id: 2, value: 'banana', label: 'Banana' }
-	];
 </script>
 
 <svelte:head>
@@ -50,6 +40,6 @@
 			designed to enhance user experience by providing a seamless way to manage selections and
 			additions.
 		</p>
-		<SelectAdd {options} />
+		<SelectAdd />
 	</div>
 </article>

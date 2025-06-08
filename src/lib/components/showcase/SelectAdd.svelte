@@ -7,31 +7,57 @@
 	import { cn } from '$lib/utils';
 
 	let {
-		options = [],
 		placeholder = 'Select an option',
 		maxOptions = 5
 	}: {
-		options?: { id: number; value: string; label: string }[];
 		placeholder?: string;
 		maxOptions?: number;
 	} = $props();
 
-	let newOption = $state('');
-	let isLimitReached = $derived(options.length >= maxOptions);
-	let isOpen = $state(false);
-	let selectedValue = $state('');
+	interface Option {
+		id: number;
+		value: string;
+		label: string;
+	}
 
-	const addNewOption = () => {
+	const options: Option[] = $state([
+		{ id: 1, value: 'apple', label: 'Apple' },
+		{ id: 2, value: 'banana', label: 'Banana' }
+	]);
+
+	let newOption = $state('');
+	let selectedValue = $state('');
+	let optionCount = $derived(options.length);
+
+	let isLimitReached = $derived(options.length >= maxOptions);
+	let optionSummary = $derived.by(() => {
+		return options.map((opt) => opt.label).join(', ');
+	});
+
+	const createNewOption = () => {
 		if (newOption.trim() === '' || isLimitReached) return;
 		const newId = options.length > 0 ? options[options.length - 1].id + 1 : 1;
-		options = [...options, { id: newId, value: newOption, label: newOption }];
+		options.push({ id: newId, value: newOption, label: newOption });
 		newOption = '';
-		isOpen = false; // Close the select after adding
 	};
+	$effect(() => {
+		if (selectedValue && !options.some((option) => option.value === selectedValue)) {
+			selectedValue = '';
+		}
+	});
 
 	const removeOption = (id: number) => {
-		options = options.filter((options) => options.id !== id);
+		const index = options.findIndex((option) => option.id === id);
+		if (index !== -1) {
+			options.splice(index, 1);
+		}
 	};
+	$effect(() => {
+		options.forEach((option) => {
+			// Directly update the value without the redundant findIndex lookup
+			option.value = option.label.toLowerCase();
+		});
+	});
 </script>
 
 <div class="grid h-[22rem] grid-cols-1 gap-4 md:grid-cols-2">
@@ -49,7 +75,7 @@
 				onValueChange={(value) => (selectedValue = value)}
 			>
 				<Select.Trigger>{placeholder}</Select.Trigger>
-				<Select.Content data-state={isOpen ? 'open' : 'closed'}>
+				<Select.Content>
 					{#each options as option}
 						<Select.Item value={option.value}>{option.label}</Select.Item>
 					{/each}
@@ -59,7 +85,7 @@
 						bind:value={newOption}
 						onkeydown={(e) => {
 							if (e.key !== 'Enter') return;
-							addNewOption();
+							createNewOption();
 						}}
 					/>
 				</Select.Content>
@@ -79,13 +105,18 @@
 						<div
 							transition:fade
 							class={cn(
-								'bg-card-foreground/5 flex items-center justify-between rounded p-3',
+								'bg-card-foreground/5 flex items-center rounded p-3',
 								selectedValue === option.value ? 'bg-card-foreground/10' : ''
 							)}
 						>
-							<div>
-								<span class="font-medium">{option.label}</span>
-								<span class="text-muted-foreground ml-2 text-xs">Value: {option.value}</span>
+							<div class="flex-1">
+								<Input
+									bind:value={option.label}
+									style="background: transparent !important; border: none !important; padding: 0 !important; box-shadow: none !important;"
+								/>
+								<span class="text-muted-foreground ml-2 text-xs"
+									>Value: {option.value.toLowerCase()}</span
+								>
 							</div>
 							<span class="bg-primary/10 text-primary rounded-full px-2 py-1 text-xs"
 								>ID: {option.id}</span
@@ -105,3 +136,16 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	:global(.input input) {
+		background: transparent !important;
+		border: none !important;
+	}
+
+	/* Target focus states */
+	:global(.input input:focus) {
+		box-shadow: none !important;
+		outline: none !important;
+	}
+</style>
