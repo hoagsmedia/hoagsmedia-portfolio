@@ -29,10 +29,16 @@
 				>
 			</NavigationMenu.Item>
 			<NavigationMenu.Item>
+				<NavigationMenu.Link href="/showcase" class="hover:text-gray-600 dark:hover:text-gray-400"
+					>Showcase</NavigationMenu.Link
+				>
+			</NavigationMenu.Item>
+			<NavigationMenu.Item>
 				<NavigationMenu.Link href="/contact" class="hover:text-gray-600 dark:hover:text-gray-400"
 					>Contact</NavigationMenu.Link
 				>
 			</NavigationMenu.Item>
+
 			<NavigationMenu.Item>
 				{#if data.user}
 					<div class="flex items-center space-x-2">
